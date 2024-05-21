@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <fcntl.h>
 #include <math.h>
 #include <memory.h>
@@ -98,7 +99,44 @@ void commandRead(int index) {
   unmapRecords();
 }
 
-void commandUpdate() {}
+char *rtrim(char *s) {
+  while (isspace(*s))
+    s++;
+  return s;
+}
+
+char *ltrim(char *s) {
+  char *back = s + strlen(s) - 1;
+  while (isspace(*back))
+    back--;
+  back[1] = 0;
+  return s;
+}
+
+char *trim(char *s) { return rtrim(ltrim(s)); }
+
+void commandUpdate() {
+  if (originIndex == -1) {
+    printf("Nothing was loaded\n");
+    return;
+  }
+  char buffer[80] = {0};
+  char *trimmed = NULL;
+
+  printf("Enter new name [%s]: ", target.name);
+  fgets(buffer, sizeof(buffer), stdin);
+  trimmed = trim(buffer);
+  if (strlen(trimmed) > 0) strcpy(target.name, trimmed);
+
+  printf("Enter new address [%s]: ", target.address);
+  fgets(buffer, sizeof(buffer), stdin);
+  trimmed = trim(buffer);
+  if (strlen(trimmed) > 0) strcpy(target.address, trimmed);
+
+  printf("Enter new semester [%d]: ", target.semester);
+  fgets(buffer, sizeof(buffer), stdin);
+  sscanf(buffer, " %hhu", &target.semester);
+}
 
 void commandSave() {
   if (originIndex == -1) {
